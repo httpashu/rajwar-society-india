@@ -23,22 +23,17 @@ function CounterNum({ target, suffix }: { target: number; suffix: string }) {
 
     const duration = 2000
     const steps = 60
-    const increment = target / steps
-    let current = 0
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
     let step = 0
 
-    const timer = setInterval(() => {
-      step++
-      const eased = Math.easeOut ? Math.easeOut(step / steps) : step / steps
-      current = Math.min(Math.round(increment * step * (1 - Math.pow(step / steps - 1, 3))), target)
-      setCount(current)
-      if (step >= steps) {
-        setCount(target)
-        clearInterval(timer)
-      }
+    const id = window.setInterval(() => {
+      step += 1
+      const t = Math.min(step / steps, 1)
+      setCount(Math.min(Math.round(target * easeOut(t)), target))
+      if (step >= steps) clearInterval(id)
     }, duration / steps)
 
-    return () => clearInterval(timer)
+    return () => clearInterval(id)
   }, [inView, target])
 
   return (
